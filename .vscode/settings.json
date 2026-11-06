@@ -1,0 +1,4 @@
+{
+  "boostRoot": "C:/boost",
+  "boostRootMac": "${env:HOME}/boost"
+}
