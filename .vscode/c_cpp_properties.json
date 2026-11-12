@@ -6,7 +6,8 @@
         "${workspaceFolder}/**",
         "${config:boostRoot}"
       ],
-      "compilerPath": "g++",
+      // Windows 使用已安装的 MinGW 编译器；旧配置为 "compilerPath": "g++"。
+      "compilerPath": "C:/mingw64/bin/g++.exe",
       "cStandard": "c17",
       "cppStandard": "c++17",
       "intelliSenseMode": "windows-gcc-x64"
@@ -20,7 +21,9 @@
       "cStandard": "c17",
       "cppStandard": "c++17",
       "intelliSenseMode": "linux-gcc-x64"
-    },
+    }
+    // 当前为 Windows，暂时停用 macOS 配置；保留作为原始配置记录。
+    /*
     {
       "name": "macOS (Clang)",
       "includePath": [
@@ -32,6 +35,7 @@
       "cppStandard": "c++17",
       "intelliSenseMode": "macos-clang-x64"
     }
+    */
   ],
   "version": 4
 }

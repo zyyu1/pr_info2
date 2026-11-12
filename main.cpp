@@ -9,6 +9,18 @@
 #include <cmath>
 #include <algorithm>  // std::min：限制最后一步的目标时间。
 
+//etest
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
+#include "PKW.h"
+#include "Fahrrad.h"
+
+using namespace std;
+extern double dGlobaleZeit;
+double dEpsilon = 0.001;
+
 //4.3.6定义全局变量,表示模拟的总时间，单位为小时。
 double dGlobaleZeit = 0.0;
 
@@ -25,8 +37,10 @@ int main()
 //4.3.3
 void vAufgabe_1()
 {
+    // 车名按创建方式编号；车名中的数字与程序自动分配的 ID 无关。
+    // 两个默认构造对象保留空名称，用于验证默认构造函数。
     Fahrzeug tAuto1;
-    Fahrzeug tAuto2("su7");
+    Fahrzeug tAuto2("car2");
 
     //4.3.5
     Fahrzeug::vKopf();
@@ -48,22 +62,22 @@ void vAufgabe_1()
     std::cout << tAuto2 << '\n';
 
     Fahrzeug* pAuto1 = new Fahrzeug;
-    Fahrzeug* pAuto2 = new Fahrzeug("yu7");
+    Fahrzeug* pAuto2 = new Fahrzeug("car2.1");
 
     //调试：delete 立即销毁指针所指车辆，可在析构函数设置断点查看调用栈。
     delete pAuto1;
     delete pAuto2;
 
     //各自独占一辆车
-    auto pUniqueAuto1 = std::make_unique<Fahrzeug>("model3");
-    auto pUniqueAuto2 = std::make_unique<Fahrzeug>("modely");
+    auto pUniqueAuto1 = std::make_unique<Fahrzeug>("car1.2");
+    auto pUniqueAuto2 = std::make_unique<Fahrzeug>("car2.2");
 
     //各自创建并持有一辆车
-    auto pSharedAuto1 = std::make_shared<Fahrzeug>("model3");
-    auto pSharedAuto2 = std::make_shared<Fahrzeug>("modely");
+    auto pSharedAuto1 = std::make_shared<Fahrzeug>("car1.3");
+    auto pSharedAuto2 = std::make_shared<Fahrzeug>("car2.3");
 
     // use_count()测试
-    //两个指针现在共同持有同一辆 model3（ID 7）
+    //两个指针现在共同持有同一辆 car1.3（ID 7）
     std::cout << "Owners before copy: " << pSharedAuto1.use_count() << '\n';
 
     auto pSharedAuto1Kopie = pSharedAuto1;
@@ -90,17 +104,17 @@ void vAufgabe_1()
     //在同一个 vector 中，复制 sharedAuto1，再移动 sharedAuto2，比较两辆车的引用计数
     std::vector<std::shared_ptr<Fahrzeug>> tSharedAutos;
 
-    //复制 sharedAuto1 后，model3（ID 7）有三个所有者：sharedAuto1、sharedAuto1Copy 和容器里的第一个元素。
+    //复制 sharedAuto1 后，car1.3（ID 7）有三个所有者：sharedAuto1、sharedAuto1Copy 和容器里的第一个元素。
     tSharedAutos.push_back(pSharedAuto1);
-    std::cout << "Model 3 owners after copy: "
+    std::cout << "car1.3 owners after copy: "
             << pSharedAuto1.use_count() << '\n';
 
-    //移动 sharedAuto2 后，modely（ID 8）的所有权转给容器。sharedAutos.back() 取出容器中最后一个指针来查询计数，结果为 1。
+    //移动 sharedAuto2 后，car2.3（ID 8）的所有权转给容器。sharedAutos.back() 取出容器中最后一个指针来查询计数，结果为 1。
     //原来的 sharedAuto2 变为空，计数为 0
     tSharedAutos.push_back(std::move(pSharedAuto2));
-    std::cout << "Model Y owners after move: "
+    std::cout << "car2.3 owners after move: "
             << tSharedAutos.back().use_count() << '\n';
-    std::cout << "Original Model Y pointer count: "
+    std::cout << "Original car2.3 pointer count: "
             << pSharedAuto2.use_count() << '\n';
     //调试：离开作用域时，容器先销毁；共享车辆仅在最后一个所有者释放时销毁。
     //局部对象 tAuto2、tAuto1 按构造逆序销毁；详见 Block1_Debug_Notes.md。
@@ -337,8 +351,8 @@ void vAufgabe_3()
 {
     dGlobaleZeit = 0.0;
 
-    PKW tAuto1("su7", 100.0, 8.0);
-    PKW tAuto2("yu7", 150.0, 10.0);
+    PKW tAuto1("car7", 100.0, 8.0);
+    PKW tAuto2("car8", 150.0, 10.0);
     Fahrrad tFahrrad1("RC100", 30.0);
 
     std::cout << "\nInitial vehicles:\n";
@@ -389,24 +403,56 @@ void vAufgabe_3()
     // Fahrzeug copy = auto1; // Copy construction is disabled.
 }
 
+//etest1
+void vAufgabe_AB1(){
+
+    int l = 0; // Laufindex für gezielte AUsgabe
+    vector<int> ausgabe{13};
+    double dTakt = 0.4;
+
+    std::vector<unique_ptr<Fahrzeug>> vecFahrzeuge;
+    vecFahrzeuge.push_back(make_unique <PKW>("Audi", 229, 9.6));
+    vecFahrzeuge.push_back(make_unique <Fahrrad>("BMX", 24.7));
+    for (dGlobaleZeit = 0; dGlobaleZeit < 10; dGlobaleZeit += dTakt)
+    {
+        auto itL = find(ausgabe.begin(), ausgabe.end(), l);
+        if (itL != ausgabe.end()) {
+            std::cout << std::endl << l <<  " Globalezeit = " << dGlobaleZeit << std::endl;
+            Fahrzeug::vKopf();
+        }
+
+        for (int i = 0; i < vecFahrzeuge.size(); i++)
+        {
+            vecFahrzeuge[i]->vSimulieren();
+            if (fabs(dGlobaleZeit - 3.0) < dTakt/2)
+            {
+                vecFahrzeuge[i]->dTanken();
+            }
+            if (itL != ausgabe.end()) {
+                std::cout << *vecFahrzeuge[i] << endl;
+            }
+        }
+        l++;
+    }
+    char c;
+    std::cin >> c;
+}
+
 int main()
 {
     //4.3.2
     /*
     Fahrzeug auto1;          // 调用默认构造函数，名称为空。
-    Fahrzeug auto2("su7");  // 调用带名称的构造函数。
+    Fahrzeug auto2("car1");  // 调用带名称的构造函数。
     */
 
     //4.3.3
     
-    //vAufgabe_1();
-    //vAufgabe_1a();
-    //vAufgabe_2();
-    //验收入口：依次执行四个测试函数；输入提示分别属于 1a 和 2。
     vAufgabe_1();
     vAufgabe_1a();
     vAufgabe_2();
     vAufgabe_3();
+    //vAufgabe_AB1();
 
     return 0;
 }
