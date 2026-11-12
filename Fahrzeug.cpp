@@ -4,8 +4,10 @@
 
 extern double dGlobaleZeit;
 
+/*删除, 因为p_iMaxID 已经转移到 Simulationsobjekt 中，由它统一管理 ID。
 // 定义所有 Fahrzeug 对象共享的计数器，初始值为 0。
 int Fahrzeug::p_iMaxID = 0;
+*/
 
 Fahrzeug::Fahrzeug()
     : Fahrzeug("")  // 将空名称交给带参数的构造函数。
@@ -35,22 +37,32 @@ Fahrzeug::Fahrzeug(std::string sName)
 }
 
 Fahrzeug::Fahrzeug(std::string sName, double dMaxGeschwindigkeit)
-    : p_sName(sName),
-      p_iID(++p_iMaxID),
+
+    //: p_sName(sName),
+    //  p_iID(++p_iMaxID),
+
+    : Simulationsobjekt(sName),  // 调用亲类构造函数 Simulationsobjekt(sName)，由亲类初始化名称和 ID
+
       //完整的条件运算符 条件 ? 值1 : 值2。
       p_dMaxGeschwindigkeit(dMaxGeschwindigkeit > 0.0
                                 ? dMaxGeschwindigkeit
                                 : 0.0)
 {
+    /*p_iID 已移入 Simulationsobjekt 的 private 区域，Fahrzeug 无法直接访问
     std::cout << "Vehicle created: Name=\"" << p_sName
               << "\", ID=" << p_iID << '\n';
+    */
+   std::cout << "Vehicle created: Name=\"" << p_sName
+          << "\"\n";
 }
 
+/*删除, 因为销毁信息已经由 Simulationsobjekt 的析构函数输出
 Fahrzeug::~Fahrzeug()
 {
     std::cout << "Vehicle destroyed: Name=\"" << p_sName
             << "\", ID=" << p_iID << '\n';
 }
+*/
 
 
 //4.3.5 设置列表
@@ -84,12 +96,25 @@ void Fahrzeug::vKopf()
 //4.5.1 将 vAusgeben() 改为接受 std::ostream& 参数，方便输出到不同的流。
 void Fahrzeug::vAusgeben(std::ostream& oAusgabe) const
 {
+    /*
     oAusgabe << std::right << std::fixed << std::setprecision(2)
       << std::setw(6)  << p_iID
       << std::setw(14) << p_sName
       << std::setw(20) << p_dMaxGeschwindigkeit
       << std::setw(22) << p_dGesamtStrecke
       << std::setw(24) << dGeschwindigkeit();
+    */
+
+    //现在由Simulationsobjekt::vAusgeben() 负责输出 ID 和名称
+    oAusgabe << std::right << std::fixed << std::setprecision(2);
+
+    // Output ID and name using the base class
+    Simulationsobjekt::vAusgeben(oAusgabe);
+
+    // Output vehicle-specific data
+    oAusgabe << std::setw(20) << p_dMaxGeschwindigkeit
+             << std::setw(22) << p_dGesamtStrecke
+             << std::setw(24) << dGeschwindigkeit();
 }
 
 //4.3.7
@@ -122,12 +147,16 @@ double Fahrzeug::dGeschwindigkeit() const
     return p_dMaxGeschwindigkeit;
 }
 
-//4.5.2
+/*
+//4.5.2删除, 统一使用 Simulationsobjekt 中定义的 operator<<
 std::ostream& operator<<(std::ostream& oAusgabe, const Fahrzeug& tFahrzeug)
 {
     tFahrzeug.vAusgeben(oAusgabe);
     return oAusgabe;
 }
+*/
+
+
 
 //4.5.4
 bool Fahrzeug::operator<(const Fahrzeug& tVergleichsfahrzeug) const
@@ -138,8 +167,18 @@ bool Fahrzeug::operator<(const Fahrzeug& tVergleichsfahrzeug) const
 //4.5.5禁止复制构造，实现赋值运算符
 Fahrzeug& Fahrzeug::operator=(const Fahrzeug& tVergleichsfahrzeug)
 {
-    p_sName = tVergleichsfahrzeug.p_sName;
-    p_dMaxGeschwindigkeit = tVergleichsfahrzeug.p_dMaxGeschwindigkeit;
+    //p_sName = tVergleichsfahrzeug.p_sName;
+    //p_dMaxGeschwindigkeit = tVergleichsfahrzeug.p_dMaxGeschwindigkeit;
+
+    // Copy the name through the base-class assignment operator.
+    // The unique ID remains unchanged.
+    if (this != &tVergleichsfahrzeug)
+    {
+        Simulationsobjekt::operator=(tVergleichsfahrzeug);
+
+        p_dMaxGeschwindigkeit =
+            tVergleichsfahrzeug.p_dMaxGeschwindigkeit;
+    }
 
     return *this;
 }

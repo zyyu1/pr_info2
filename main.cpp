@@ -9,13 +9,10 @@
 #include <cmath>
 #include <algorithm>  // std::min：限制最后一步的目标时间。
 
-//etest
-#include <iostream>
-#include <vector>
 #include <iomanip>
-#include <algorithm>
-#include "PKW.h"
-#include "Fahrrad.h"
+
+#include "Weg.h"
+
 
 using namespace std;
 extern double dGlobaleZeit;
@@ -438,6 +435,19 @@ void vAufgabe_AB1(){
     std::cin >> c;
 }
 
+// Test the Weg class
+void vAufgabe_4()
+{
+    Weg tWeg("weg", 100.0);
+
+    Weg::vKopf();
+    std::cout << tWeg << std::endl;
+
+    std::cout << "Speed limit: "
+              << tWeg.getTempolimit()
+              << " km/h" << std::endl;
+}
+
 int main()
 {
     //4.3.2
@@ -448,11 +458,12 @@ int main()
 
     //4.3.3
     
-    vAufgabe_1();
-    vAufgabe_1a();
-    vAufgabe_2();
-    vAufgabe_3();
+    //vAufgabe_1();
+    //vAufgabe_1a();
+    //vAufgabe_2();
+    //vAufgabe_3();
     //vAufgabe_AB1();
+    vAufgabe_4();
 
     return 0;
 }

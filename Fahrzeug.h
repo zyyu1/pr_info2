@@ -5,13 +5,18 @@
 #include <string>
 #include <limits>
 #include <ostream>
+#include "Simulationsobjekt.h"
 
-class Fahrzeug
+//class Fahrzeug
+class Fahrzeug : public Simulationsobjekt   //修改继承关系
 {
+
+/* 成员现在都由 Simulationsobjekt 提供
 private:
     std::string p_sName = ""; // 每辆车各自的名称
     const int p_iID;          // 每辆车各自的编号，初始化后不能改变
     static int p_iMaxID;      // 所有车辆共享的编号计数器
+*/
 
 //4.4.2
 protected:
@@ -22,7 +27,8 @@ protected:
     double p_dMaxGeschwindigkeit = 0.0; // Maximum speed in km/h.
     double p_dGesamtStrecke = 0.0;      // Total distance traveled in km.
     double p_dGesamtZeit = 0.0;         // Total driving time in hours.
-    double p_dZeit = 0.0;               // Time of the last simulation step in hours.
+    //由 Simulationsobjekt 提供
+    //double p_dZeit = 0.0;               // Time of the last simulation step in hours.
 
 
 public:
@@ -31,13 +37,24 @@ public:
     Fahrzeug(std::string sName);    // 带名称的构造函数
    // ~Fahrzeug();                   // 析构函数
 
-    //4.4.1
-    //virtual 让程序通过 Fahrzeug 指针也能调用对应子类的实现
-    virtual ~Fahrzeug();
+   /*
+    //4.4.1 virtual 让程序通过 Fahrzeug 指针也能调用对应子类的实现
+    virtual ~Fahrzeug();                 
     //virtual void vAusgeben() const;
+
     //4.5.1
     virtual void vAusgeben(std::ostream& oAusgabe) const;
     virtual void vSimulieren();
+    */
+
+    //统一使用 Simulationsobjekt 提供的版本
+    ~Fahrzeug() override = default;
+    void vAusgeben(std::ostream& oAusgabe) const override;
+    void vSimulieren() override;
+
+
+
+
 
 
     Fahrzeug(std::string sName, double dMaxGeschwindigkeit);
@@ -65,5 +82,7 @@ public:
 
 };
 
+/*统一使用 Simulationsobjekt 提供的版本
 //4.5.2重载输出运算符 <<。完成后，就能使用 std::cout << auto1 输出车辆。
 std::ostream& operator<<(std::ostream& oAusgabe, const Fahrzeug& tFahrzeug);
+*/
